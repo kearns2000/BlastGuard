@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>BlastGuard.Cli</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>blastguard</ToolCommandName>
+    <PackageId>BlastGuard</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>BlastGuard</Authors>
+    <Title>BlastGuard - Pull Request Blast Radius Scorer</Title>
+    <Description>A .NET global tool that scores pull request blast radius and review risk. Analyses git diffs for API contracts, EF Core migrations, production configuration, security-sensitive code, and missing tests. Run locally or in GitHub Actions CI.</Description>
+    <PackageTags>blastguard;pull-request;pull-request-review;code-review;pr-review;risk-score;blast-radius;change-impact;change-analysis;dotnet-tool;global-tool;cli;git;git-diff;github-actions;ci;cd;devops;ef-core;migration;database;security;configuration;api;openapi;contract;reviewer;developer-tools;dotnet;net10;csharp;testing;quality;static-analysis;pr;diff;appsettings;nuget-tool</PackageTags>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>blastguard-logo.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/kearns2000/blastguard</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/kearns2000/blastguard.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlastGuard.Core\BlastGuard.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\docs\blastguard-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="BlastGuard.Cli.Tests" />
+  </ItemGroup>
+
+</Project>

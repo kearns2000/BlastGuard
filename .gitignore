@@ -1,0 +1,20 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Tooling
+.idea/
+.vs/
+*.swp
+*~
+
+## OS
+.DS_Store
+Thumbs.db
+
+## BlastGuard output
+blastguard-report.*

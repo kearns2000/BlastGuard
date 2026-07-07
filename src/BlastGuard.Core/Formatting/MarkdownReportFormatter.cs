@@ -1,0 +1,52 @@
+using System.Text;
+using BlastGuard.Core.Scoring;
+
+namespace BlastGuard.Core.Formatting;
+
+public sealed class MarkdownReportFormatter : IReportFormatter
+{
+    public string Format(BlastRadiusReport report, bool includeSuggestions = true)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine("# BlastGuard report");
+        builder.AppendLine();
+        builder.AppendLine($"**Score:** {report.Score} / 100  ");
+        builder.AppendLine($"**Risk:** {report.RiskLevel}");
+        builder.AppendLine();
+
+        var findings = report.Findings.Where(f => f.Points != 0).ToList();
+        if (findings.Count > 0)
+        {
+            builder.AppendLine("## Findings");
+            builder.AppendLine();
+            builder.AppendLine("| Area | Finding | Points |");
+            builder.AppendLine("|---|---|---:|");
+
+            foreach (var finding in findings)
+            {
+                var points = finding.Points > 0 ? $"+{finding.Points}" : finding.Points.ToString();
+                builder.AppendLine($"| {FormatCategory(finding.Category)} | {finding.Title} | {points} |");
+            }
+        }
+
+        if (includeSuggestions && report.SuggestedReviewFocus.Count > 0)
+        {
+            builder.AppendLine();
+            builder.AppendLine("## Suggested review focus");
+            builder.AppendLine();
+            foreach (var suggestion in report.SuggestedReviewFocus)
+            {
+                builder.AppendLine($"- {suggestion}");
+            }
+        }
+
+        return builder.ToString().TrimEnd();
+    }
+
+    private static string FormatCategory(RiskCategory category) => category switch
+    {
+        RiskCategory.RuntimeBehaviour => "Runtime behaviour",
+        RiskCategory.PublicContract => "Public contract",
+        _ => category.ToString()
+    };
+}

@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BlastGuard.Cli/BlastGuard.Cli.csproj" />
+    <Project Path="src/BlastGuard.Core/BlastGuard.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BlastGuard.Cli.Tests/BlastGuard.Cli.Tests.csproj" />
+    <Project Path="tests/BlastGuard.Core.Tests/BlastGuard.Core.Tests.csproj" />
+  </Folder>
+</Solution>

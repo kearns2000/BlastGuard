@@ -1,0 +1,61 @@
+{
+  "thresholds": {
+    "medium": 25,
+    "high": 50,
+    "critical": 75
+  },
+  "boundedAreaRoots": [
+    "src/Features",
+    "src/Modules",
+    "src"
+  ],
+  "ignorePatterns": [
+    "**/*.Designer.cs",
+    "**/*.g.cs",
+    "**/bin/**",
+    "**/obj/**",
+    "**/Generated/**"
+  ],
+  "securityPathHints": [
+    "Auth",
+    "Authentication",
+    "Authorization",
+    "Authorisation",
+    "Claims"
+  ],
+  "rules": {
+    "bounded-area": {
+      "enabled": true
+    },
+    "public-contract": {
+      "enabled": true
+    },
+    "database": {
+      "enabled": true
+    },
+    "configuration": {
+      "enabled": true
+    },
+    "security": {
+      "enabled": true
+    },
+    "runtime-behaviour": {
+      "enabled": true
+    },
+    "test-signal": {
+      "enabled": true
+    },
+    "no-test-changes": {
+      "enabled": true
+    },
+    "dependency": {
+      "enabled": true
+    },
+    "large-change": {
+      "enabled": true
+    },
+    "documentation-only": {
+      "enabled": true
+    }
+  }
+}
