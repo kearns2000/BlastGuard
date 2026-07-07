@@ -1,4 +1,4 @@
-name: BlastGuard
+name: BlastGuard PR Blast Radius
 description: Score pull request blast radius and review risk for .NET repositories.
 author: kearns2000
 
