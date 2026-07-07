@@ -99,7 +99,13 @@ Suggested review focus:
 
 ### Using the BlastGuard action (recommended)
 
-The quickest way is the published GitHub Action, which installs .NET, installs the tool, runs it, and adds the report to the job summary.
+BlastGuard is published on the [GitHub Marketplace](https://github.com/marketplace/actions/blastguard-pr-blast-radius). The action installs .NET, installs the tool, runs it, and adds the report to the job summary.
+
+To add it from the Marketplace:
+
+1. Open the [BlastGuard PR Blast Radius](https://github.com/marketplace/actions/blastguard-pr-blast-radius) listing.
+2. Click **Use latest version** and copy the snippet, or use the workflow below.
+3. Commit the workflow to `.github/workflows/blastguard.yml` in your repository.
 
 ```yaml
 name: BlastGuard
@@ -124,7 +130,23 @@ jobs:
           head: HEAD
 ```
 
-Available inputs: `base`, `head`, `repo`, `format`, `output`, `config`, `fail-threshold`, `include-suggestions`, `version`, `dotnet-version`, and `job-summary`.
+Pin to a specific release (for example `kearns2000/BlastGuard@v1.0.0`) if you prefer reproducible runs over automatic minor updates.
+
+#### Inputs
+
+| Input | Description | Default |
+| --- | --- | --- |
+| `base` | Base git ref to compare against. | `origin/main` |
+| `head` | Head git ref to analyse. | `HEAD` |
+| `repo` | Path to the git repository. | `.` |
+| `format` | Output format: `text`, `json`, `markdown`, or `github`. | `github` |
+| `output` | Output file path for the report. | `blastguard-report.md` |
+| `config` | Optional path to a `blastguard.json` configuration file. | `''` |
+| `fail-threshold` | Fail the step when the score meets or exceeds this value. Leave empty to never fail. | `''` |
+| `include-suggestions` | Include suggested review focus in the output. | `true` |
+| `version` | BlastGuard tool version to install. Defaults to the latest release. | `''` |
+| `dotnet-version` | .NET SDK version to install. | `10.0.x` |
+| `job-summary` | Append the report to the GitHub Actions job summary. | `true` |
 
 ### Running the tool directly
 
