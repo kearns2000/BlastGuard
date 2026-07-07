@@ -1,0 +1,100 @@
+name: BlastGuard
+description: Score pull request blast radius and review risk for .NET repositories.
+author: kearns2000
+
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  base:
+    description: Base git ref to compare against.
+    required: false
+    default: origin/main
+  head:
+    description: Head git ref to analyse.
+    required: false
+    default: HEAD
+  repo:
+    description: Path to the git repository.
+    required: false
+    default: .
+  format:
+    description: Output format (text, json, markdown, or github).
+    required: false
+    default: github
+  output:
+    description: Output file path for the report.
+    required: false
+    default: blastguard-report.md
+  config:
+    description: Optional path to a blastguard.json configuration file.
+    required: false
+    default: ''
+  fail-threshold:
+    description: Fail the step when the score meets or exceeds this value. Leave empty to never fail.
+    required: false
+    default: ''
+  include-suggestions:
+    description: Include suggested review focus in the output.
+    required: false
+    default: 'true'
+  version:
+    description: BlastGuard tool version to install. Defaults to the latest release.
+    required: false
+    default: ''
+  dotnet-version:
+    description: .NET SDK version to install.
+    required: false
+    default: 10.0.x
+  job-summary:
+    description: Append the report to the GitHub Actions job summary.
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Install BlastGuard
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.version }}" ]; then
+          dotnet tool install --global BlastGuard --version "${{ inputs.version }}"
+        else
+          dotnet tool install --global BlastGuard
+        fi
+        echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+    - name: Run BlastGuard
+      shell: bash
+      run: |
+        args=(analyse
+          --repo "${{ inputs.repo }}"
+          --base "${{ inputs.base }}"
+          --head "${{ inputs.head }}"
+          --format "${{ inputs.format }}"
+          --output "${{ inputs.output }}"
+          --include-suggestions "${{ inputs.include-suggestions }}")
+
+        if [ -n "${{ inputs.config }}" ]; then
+          args+=(--config "${{ inputs.config }}")
+        fi
+
+        if [ -n "${{ inputs.fail-threshold }}" ]; then
+          args+=(--fail-threshold "${{ inputs.fail-threshold }}")
+        fi
+
+        blastguard "${args[@]}"
+
+    - name: Add report to job summary
+      if: ${{ inputs.job-summary == 'true' }}
+      shell: bash
+      run: |
+        if [ -f "${{ inputs.output }}" ]; then
+          cat "${{ inputs.output }}" >> "$GITHUB_STEP_SUMMARY"
+        fi

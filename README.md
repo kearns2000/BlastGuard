@@ -97,6 +97,39 @@ Suggested review focus:
 
 ## GitHub Actions usage
 
+### Using the BlastGuard action (recommended)
+
+The quickest way is the published GitHub Action, which installs .NET, installs the tool, runs it, and adds the report to the job summary.
+
+```yaml
+name: BlastGuard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  blastguard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: kearns2000/BlastGuard@v1
+        with:
+          base: origin/main
+          head: HEAD
+```
+
+Available inputs: `base`, `head`, `repo`, `format`, `output`, `config`, `fail-threshold`, `include-suggestions`, `version`, `dotnet-version`, and `job-summary`.
+
+### Running the tool directly
+
+If you prefer to install and run the tool yourself:
+
 ```yaml
 name: BlastGuard
 
