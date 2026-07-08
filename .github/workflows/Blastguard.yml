@@ -1,0 +1,20 @@
+name: BlastGuard
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  blastguard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: kearns2000/BlastGuard@v1
+        with:
+          base: origin/main
+          head: HEAD
