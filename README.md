@@ -18,7 +18,7 @@ BlastGuard is a lightweight .NET CLI for scoring pull request risk based on chan
 
 BlastGuard does not prove a pull request is safe or unsafe. It highlights signals that usually deserve more careful review.
 
-## What problem does it solve?
+ 
 
 Pull requests can look small while still touching public contracts, database migrations, production configuration, or security-sensitive code. BlastGuard gives reviewers a practical warning label before they start reviewing, so they know where to spend extra attention.
 
