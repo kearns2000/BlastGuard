@@ -22,5 +22,5 @@ public static class PathMatcher
     }
 
     public static string NormalisePath(string path) =>
-        path.Replace('\\', '/').TrimStart('/');
+        path.Replace('\\\\\\', '/').TrimStart('/');
 }
