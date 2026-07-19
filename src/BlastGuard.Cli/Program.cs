@@ -12,7 +12,7 @@ public static class Program
     internal static RootCommand CreateRootCommand()
     {
         var repoOption = new Option<string>("--repo", () => ".", "Path to the git repository.");
-        var baseOption = new Option<string>("--base", () => "main", "Base git ref to compare against.");
+        var baseOption = new Option<string>("--base", () => "origin/main", "Base git ref to compare against.");
         var headOption = new Option<string>("--head", () => "HEAD", "Head git ref to analyse.");
         var formatOption = new Option<string>("--format", () => "text", "Output format: text, json, markdown, or github.");
         var outputOption = new Option<string?>("--output", "Optional output file path.");

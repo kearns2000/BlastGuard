@@ -23,4 +23,26 @@ public class RuntimeBehaviourRuleTests
             f.Category == Scoring.RiskCategory.RuntimeBehaviour
             && f.Title.Contains("Retry"));
     }
+
+    [Fact]
+    public void DetectsQueueHandlingChanges()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("src/Messaging/OrderQueue.cs", patch: "public class OrderQueue { }"));
+
+        Assert.Contains(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.RuntimeBehaviour
+            && f.Title.Contains("Queue"));
+    }
+
+    [Fact]
+    public void DoesNotFlagDequeueAsQueueHandling()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("src/Collections/StackHelpers.cs", patch: "var item = stack.Dequeue();"));
+
+        Assert.DoesNotContain(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.RuntimeBehaviour
+            && f.Title.Contains("Queue"));
+    }
 }

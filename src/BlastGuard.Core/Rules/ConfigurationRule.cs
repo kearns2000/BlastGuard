@@ -101,12 +101,56 @@ public sealed class ConfigurationRule : IBlastGuardRule
         || segment.Equals("Configuration", StringComparison.OrdinalIgnoreCase));
   }
 
-  private static bool IsInfrastructureConfig(string path) =>
-      path.EndsWith(".bicep", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith(".tf", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith(".yml", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith("Dockerfile", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith("docker-compose.yml", StringComparison.OrdinalIgnoreCase)
-      || path.EndsWith("docker-compose.yaml", StringComparison.OrdinalIgnoreCase);
+  private static bool IsInfrastructureConfig(string path)
+  {
+    var normalised = PathMatcher.NormalisePath(path);
+
+    // Workflow and GitHub metadata changes are not infrastructure configuration.
+    if (normalised.StartsWith(".github/", StringComparison.OrdinalIgnoreCase))
+    {
+      return false;
+    }
+
+    if (normalised.EndsWith(".bicep", StringComparison.OrdinalIgnoreCase)
+        || normalised.EndsWith(".tf", StringComparison.OrdinalIgnoreCase)
+        || normalised.EndsWith("/Dockerfile", StringComparison.OrdinalIgnoreCase)
+        || normalised.Equals("Dockerfile", StringComparison.OrdinalIgnoreCase)
+        || Path.GetFileName(normalised).StartsWith("docker-compose", StringComparison.OrdinalIgnoreCase))
+    {
+      return true;
+    }
+
+    if (!normalised.EndsWith(".yaml", StringComparison.OrdinalIgnoreCase)
+        && !normalised.EndsWith(".yml", StringComparison.OrdinalIgnoreCase))
+    {
+      return false;
+    }
+
+    var fileName = Path.GetFileName(normalised);
+    if (fileName.StartsWith("docker-compose", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("compose.yaml", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("compose.yml", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("values.yaml", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("values.yml", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("Chart.yaml", StringComparison.OrdinalIgnoreCase)
+        || fileName.Equals("Chart.yml", StringComparison.OrdinalIgnoreCase))
+    {
+      return true;
+    }
+
+    var segments = normalised.Split('/', StringSplitOptions.RemoveEmptyEntries);
+    return segments.Any(segment =>
+        segment.Equals("infra", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("infrastructure", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("deploy", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("deployment", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("deployments", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("k8s", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("kubernetes", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("helm", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("charts", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("terraform", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("pulumi", StringComparison.OrdinalIgnoreCase)
+        || segment.Equals("ops", StringComparison.OrdinalIgnoreCase));
+  }
 }

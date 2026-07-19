@@ -8,7 +8,7 @@ branding:
 
 inputs:
   base:
-    description: Base git ref to compare against.
+    description: Base git ref to compare against. Requires actions/checkout with fetch-depth 0 so the ref is available.
     required: false
     default: origin/main
   head:
@@ -40,7 +40,7 @@ inputs:
     required: false
     default: 'true'
   version:
-    description: BlastGuard tool version to install. Defaults to the latest release.
+    description: BlastGuard NuGet tool version to install. Leave empty for latest. Pin this to the same release as the action tag when you need reproducible runs.
     required: false
     default: ''
   dotnet-version:
@@ -62,39 +62,56 @@ runs:
 
     - name: Install BlastGuard
       shell: bash
+      env:
+        BLASTGUARD_VERSION: ${{ inputs.version }}
       run: |
-        if [ -n "${{ inputs.version }}" ]; then
-          dotnet tool install --global BlastGuard --version "${{ inputs.version }}"
+        if [ -n "$BLASTGUARD_VERSION" ]; then
+          if ! dotnet tool install --global BlastGuard --version "$BLASTGUARD_VERSION"; then
+            dotnet tool update --global BlastGuard --version "$BLASTGUARD_VERSION"
+          fi
         else
-          dotnet tool install --global BlastGuard
+          if ! dotnet tool install --global BlastGuard; then
+            dotnet tool update --global BlastGuard
+          fi
         fi
         echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
     - name: Run BlastGuard
       shell: bash
+      env:
+        BLASTGUARD_REPO: ${{ inputs.repo }}
+        BLASTGUARD_BASE: ${{ inputs.base }}
+        BLASTGUARD_HEAD: ${{ inputs.head }}
+        BLASTGUARD_FORMAT: ${{ inputs.format }}
+        BLASTGUARD_OUTPUT: ${{ inputs.output }}
+        BLASTGUARD_CONFIG: ${{ inputs.config }}
+        BLASTGUARD_FAIL_THRESHOLD: ${{ inputs.fail-threshold }}
+        BLASTGUARD_INCLUDE_SUGGESTIONS: ${{ inputs.include-suggestions }}
       run: |
         args=(analyse
-          --repo "${{ inputs.repo }}"
-          --base "${{ inputs.base }}"
-          --head "${{ inputs.head }}"
-          --format "${{ inputs.format }}"
-          --output "${{ inputs.output }}"
-          --include-suggestions "${{ inputs.include-suggestions }}")
+          --repo "$BLASTGUARD_REPO"
+          --base "$BLASTGUARD_BASE"
+          --head "$BLASTGUARD_HEAD"
+          --format "$BLASTGUARD_FORMAT"
+          --output "$BLASTGUARD_OUTPUT"
+          --include-suggestions "$BLASTGUARD_INCLUDE_SUGGESTIONS")
 
-        if [ -n "${{ inputs.config }}" ]; then
-          args+=(--config "${{ inputs.config }}")
+        if [ -n "$BLASTGUARD_CONFIG" ]; then
+          args+=(--config "$BLASTGUARD_CONFIG")
         fi
 
-        if [ -n "${{ inputs.fail-threshold }}" ]; then
-          args+=(--fail-threshold "${{ inputs.fail-threshold }}")
+        if [ -n "$BLASTGUARD_FAIL_THRESHOLD" ]; then
+          args+=(--fail-threshold "$BLASTGUARD_FAIL_THRESHOLD")
         fi
 
         blastguard "${args[@]}"
 
     - name: Add report to job summary
-      if: ${{ inputs.job-summary == 'true' }}
+      if: ${{ always() && inputs.job-summary == 'true' }}
       shell: bash
+      env:
+        BLASTGUARD_OUTPUT: ${{ inputs.output }}
       run: |
-        if [ -f "${{ inputs.output }}" ]; then
-          cat "${{ inputs.output }}" >> "$GITHUB_STEP_SUMMARY"
+        if [ -f "$BLASTGUARD_OUTPUT" ]; then
+          cat "$BLASTGUARD_OUTPUT" >> "$GITHUB_STEP_SUMMARY"
         fi

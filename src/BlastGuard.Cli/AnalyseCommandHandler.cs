@@ -64,7 +64,14 @@ public sealed class AnalyseCommandHandler(
 
             if (!string.IsNullOrWhiteSpace(options.Output))
             {
-                await File.WriteAllTextAsync(options.Output, output + Environment.NewLine, cancellationToken);
+                var fullOutputPath = Path.GetFullPath(options.Output);
+                var outputDirectory = Path.GetDirectoryName(fullOutputPath);
+                if (!string.IsNullOrWhiteSpace(outputDirectory))
+                {
+                    Directory.CreateDirectory(outputDirectory);
+                }
+
+                await File.WriteAllTextAsync(fullOutputPath, output + Environment.NewLine, cancellationToken);
             }
             else
             {
@@ -100,7 +107,7 @@ public sealed class AnalyseOptions
 {
     public string Repo { get; init; } = ".";
 
-    public string Base { get; init; } = "main";
+    public string Base { get; init; } = "origin/main";
 
     public string Head { get; init; } = "HEAD";
 

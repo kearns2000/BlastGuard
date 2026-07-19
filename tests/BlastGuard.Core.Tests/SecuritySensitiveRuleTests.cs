@@ -72,4 +72,28 @@ public class SecuritySensitiveRuleTests
             f.Category == Scoring.RiskCategory.Security
             && f.Title.Contains("CORS"));
     }
+
+    [Fact]
+    public void DoesNotFlagGenericPolicyOrRolesWords()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File(
+                "src/Billing/RetryPolicy.cs",
+                patch: "public class RetryPolicy { public string[] Roles { get; set; } }"));
+
+        Assert.DoesNotContain(report.Findings, f => f.Category == Scoring.RiskCategory.Security);
+    }
+
+    [Fact]
+    public void DetectsAuthorizationPolicy()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File(
+                "src/Security/AdminAuthorizationPolicy.cs",
+                patch: "public sealed class AdminAuthorizationPolicy : IAuthorizationRequirement { }"));
+
+        Assert.Contains(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.Security
+            && f.Title.Contains("Authorisation"));
+    }
 }

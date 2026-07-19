@@ -65,6 +65,70 @@ public class AnalyseCommandHandlerTests
         }
     }
 
+    [Fact]
+    public async Task OmitsSuggestionsWhenIncludeSuggestionsIsFalse()
+    {
+        var outputPath = Path.Combine(Path.GetTempPath(), $"blastguard-{Guid.NewGuid():N}.txt");
+        try
+        {
+            var handler = CreateHandler(new FakeGitDiffProvider(
+                TestFixtures.CreateChangeSet(
+                    new ChangedFile(
+                        "src/Controllers/OrdersController.cs",
+                        FileChangeStatus.Modified,
+                        10,
+                        5,
+                        null,
+                        "MapGet(\"/orders\");"))));
+
+            var exitCode = await handler.ExecuteAsync(
+                new AnalyseOptions
+                {
+                    Format = "text",
+                    Output = outputPath,
+                    IncludeSuggestions = false
+                },
+                CancellationToken.None);
+
+            Assert.Equal(0, exitCode);
+            var content = await File.ReadAllTextAsync(outputPath);
+            Assert.DoesNotContain("Suggested review focus", content);
+        }
+        finally
+        {
+            if (File.Exists(outputPath))
+            {
+                File.Delete(outputPath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task CreatesMissingOutputDirectories()
+    {
+        var outputDir = Path.Combine(Path.GetTempPath(), $"blastguard-out-{Guid.NewGuid():N}", "nested");
+        var outputPath = Path.Combine(outputDir, "report.md");
+
+        try
+        {
+            var handler = CreateHandler(new FakeGitDiffProvider());
+            var exitCode = await handler.ExecuteAsync(
+                new AnalyseOptions { Format = "markdown", Output = outputPath },
+                CancellationToken.None);
+
+            Assert.Equal(0, exitCode);
+            Assert.True(File.Exists(outputPath));
+        }
+        finally
+        {
+            var root = Directory.GetParent(outputDir)?.FullName;
+            if (root is not null && Directory.Exists(root))
+            {
+                Directory.Delete(root, recursive: true);
+            }
+        }
+    }
+
     private static AnalyseCommandHandler CreateHandler(IGitDiffProvider gitDiffProvider) =>
         new(gitDiffProvider, BlastGuardScorer.CreateDefault());
 

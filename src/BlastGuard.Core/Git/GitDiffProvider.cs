@@ -148,12 +148,38 @@ public sealed class GitDiffProvider(IGitProcessRunner gitRunner) : IGitDiffProvi
 
             int? added = parts[0] == "-" ? null : int.TryParse(parts[0], out var a) ? a : (int?)null;
             int? deleted = parts[1] == "-" ? null : int.TryParse(parts[1], out var d) ? d : (int?)null;
-            var path = parts[2];
+            var path = ResolveNumStatPath(parts[2]);
 
             result[path] = (added, deleted);
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Git numstat reports renames as "old => new" or "dir/{old => new}".
+    /// Lookup keys must use the destination path so they match name-status.
+    /// </summary>
+    internal static string ResolveNumStatPath(string path)
+    {
+        const string arrow = " => ";
+        var arrowIndex = path.IndexOf(arrow, StringComparison.Ordinal);
+        if (arrowIndex < 0)
+        {
+            return path;
+        }
+
+        var braceStart = path.IndexOf('{');
+        var braceEnd = path.IndexOf('}', braceStart + 1);
+        if (braceStart >= 0 && braceEnd > braceStart && arrowIndex > braceStart && arrowIndex < braceEnd)
+        {
+            var prefix = path[..braceStart];
+            var suffix = path[(braceEnd + 1)..];
+            var newName = path[(arrowIndex + arrow.Length)..braceEnd];
+            return prefix + newName + suffix;
+        }
+
+        return path[(arrowIndex + arrow.Length)..];
     }
 
     internal static Dictionary<string, string> ParsePatches(string patchOutput)

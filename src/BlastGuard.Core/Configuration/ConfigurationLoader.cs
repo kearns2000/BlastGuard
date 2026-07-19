@@ -30,12 +30,16 @@ public static class ConfigurationLoader
 
     public static string? ResolveConfigPath(string? configPath, string repositoryPath)
     {
+        var repoRoot = Path.GetFullPath(repositoryPath);
+
         if (!string.IsNullOrWhiteSpace(configPath))
         {
-            return Path.GetFullPath(configPath);
+            return Path.IsPathRooted(configPath)
+                ? Path.GetFullPath(configPath)
+                : Path.GetFullPath(Path.Combine(repoRoot, configPath));
         }
 
-        var defaultPath = Path.Combine(Path.GetFullPath(repositoryPath), "blastguard.json");
+        var defaultPath = Path.Combine(repoRoot, "blastguard.json");
         return File.Exists(defaultPath) ? defaultPath : null;
     }
 

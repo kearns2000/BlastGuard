@@ -37,13 +37,13 @@ Trusted publishing still needs your NuGet username for the login step; the tempo
 
 ### 3. Publish the first version
 
-1. Ensure `Version` in `src/BlastGuard.Cli/BlastGuard.Cli.csproj` is correct (e.g. `1.0.0`)
+1. Ensure `Version` in `src/BlastGuard.Cli/BlastGuard.Cli.csproj` is correct (e.g. `1.1.0`)
 2. Commit and push to `main`
 3. Create and push a version tag:
 
 ```bash
-git tag v1.0.0
-git push origin v1.0.0
+git tag v1.1.0
+git push origin v1.1.0
 ```
 
 4. Watch **Actions then ci** on GitHub (the publish job runs after build)
@@ -79,7 +79,7 @@ developer-tools
 
 1. Bump `<Version>` in `src/BlastGuard.Cli/BlastGuard.Cli.csproj`
 2. Commit, push to `main`
-3. Tag and push: `git tag v1.0.1 && git push origin v1.0.1`
+3. Tag and push: `git tag v1.1.1 && git push origin v1.1.1`
 
 Each tag triggers build then test then pack then trusted publish.
 

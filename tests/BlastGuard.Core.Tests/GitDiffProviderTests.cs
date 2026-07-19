@@ -41,6 +41,45 @@ public class GitDiffProviderTests
     }
 
     [Theory]
+    [InlineData("old.txt => new.txt", "new.txt")]
+    [InlineData("src/{Old.cs => New.cs}", "src/New.cs")]
+    [InlineData("src/Unchanged.cs", "src/Unchanged.cs")]
+    public void ResolveNumStatPath_UsesDestinationPathForRenames(string input, string expected)
+    {
+        Assert.Equal(expected, GitDiffProvider.ResolveNumStatPath(input));
+    }
+
+    [Fact]
+    public void ParseNumStat_MapsRenamePathsToDestination()
+    {
+        var result = GitDiffProvider.ParseNumStat("1\t0\told.txt => new.txt\n3\t1\tsrc/{Old.cs => New.cs}");
+
+        Assert.Equal(1, result["new.txt"].Added);
+        Assert.Equal(0, result["new.txt"].Deleted);
+        Assert.Equal(3, result["src/New.cs"].Added);
+        Assert.Equal(1, result["src/New.cs"].Deleted);
+        Assert.False(result.ContainsKey("old.txt => new.txt"));
+    }
+
+    [Fact]
+    public void ParseNameStatus_JoinsRenameLineCountsFromNumStat()
+    {
+        var nameStatus = "R050\told.txt\tnew.txt";
+        var numStat = GitDiffProvider.ParseNumStat("1\t0\told.txt => new.txt");
+        var patches = new Dictionary<string, string>
+        {
+            ["new.txt"] = "diff --git a/old.txt b/new.txt"
+        };
+
+        var files = GitDiffProvider.ParseNameStatus(nameStatus, numStat, patches);
+
+        Assert.Single(files);
+        Assert.Equal(FileChangeStatus.Renamed, files[0].Status);
+        Assert.Equal(1, files[0].LinesAdded);
+        Assert.Equal(0, files[0].LinesDeleted);
+    }
+
+    [Theory]
     [InlineData("--upload-pack=/tmp/evil.sh")]
     [InlineData("-x")]
     [InlineData("")]

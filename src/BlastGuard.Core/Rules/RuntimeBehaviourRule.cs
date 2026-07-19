@@ -50,7 +50,7 @@ public sealed class RuntimeBehaviourRule : IBlastGuardRule
           continue;
         }
 
-        if (indicators.Any(indicator => searchText.Contains(indicator, StringComparison.Ordinal)))
+        if (indicators.Any(indicator => MatchesIndicator(searchText, indicator)))
         {
           reported.Add(key);
           yield return new RiskFinding(
@@ -63,5 +63,19 @@ public sealed class RuntimeBehaviourRule : IBlastGuardRule
         }
       }
     }
+  }
+
+  /// <summary>
+  /// Uses identifier-aware matching for plain words so "Queue" does not match "Dequeue".
+  /// Keeps ordinal substring matching for indicators that include punctuation or API shapes.
+  /// </summary>
+  internal static bool MatchesIndicator(string searchText, string indicator)
+  {
+    if (indicator.IndexOfAny(['<', '(', '.', ' ']) >= 0)
+    {
+      return searchText.Contains(indicator, StringComparison.Ordinal);
+    }
+
+    return IdentifierMatcher.ContainsIdentifier(searchText, indicator);
   }
 }

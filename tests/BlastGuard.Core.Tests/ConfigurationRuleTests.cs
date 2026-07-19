@@ -26,6 +26,33 @@ public class ConfigurationRuleTests
     }
 
     [Fact]
+    public void DetectsInfraYamlUnderInfraRoot()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("infra/api-deployment.yaml"));
+
+        Assert.Contains(report.Findings, f => f.Category == Scoring.RiskCategory.Infrastructure);
+    }
+
+    [Fact]
+    public void DoesNotFlagGitHubWorkflowYamlAsInfrastructure()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File(".github/workflows/ci.yml"));
+
+        Assert.DoesNotContain(report.Findings, f => f.Category == Scoring.RiskCategory.Infrastructure);
+    }
+
+    [Fact]
+    public void DoesNotFlagArbitraryYamlAsInfrastructure()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("docs/examples/sample.yaml"));
+
+        Assert.DoesNotContain(report.Findings, f => f.Category == Scoring.RiskCategory.Infrastructure);
+    }
+
+    [Fact]
     public void DetectsOptionsClassByFileNameSuffix()
     {
         var report = TestFixtures.Score(

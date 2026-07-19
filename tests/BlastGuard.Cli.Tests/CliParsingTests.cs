@@ -23,4 +23,15 @@ public class CliParsingTests
 
         Assert.NotEqual(0, exitCode);
     }
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData("false")]
+    public void IncludeSuggestions_AcceptsBooleanLiterals(string value)
+    {
+        var root = Program.CreateRootCommand();
+        var parseResult = root.Parse(["analyse", "--include-suggestions", value]);
+
+        Assert.Empty(parseResult.Errors);
+    }
 }

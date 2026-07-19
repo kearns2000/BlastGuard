@@ -3,6 +3,7 @@
 # BlastGuard
 
 [![NuGet](https://img.shields.io/nuget/v/BlastGuard?style=flat&logo=nuget)](https://www.nuget.org/packages/BlastGuard)
+[![Downloads](https://img.shields.io/nuget/dt/BlastGuard?style=flat&logo=nuget)](https://www.nuget.org/packages/BlastGuard)
 [![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?style=flat&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/download/dotnet/10.0)
 [![Build](https://github.com/kearns2000/blastguard/actions/workflows/ci.yml/badge.svg)](https://github.com/kearns2000/blastguard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/kearns2000/blastguard)](LICENSE)
@@ -37,7 +38,7 @@ See [PUBLISHING.md](PUBLISHING.md) for how releases are published via NuGet trus
 From a git repository:
 
 ```bash
-blastguard analyse --base main --head HEAD
+blastguard analyse --base origin/main --head HEAD
 ```
 
 Compare against a remote base branch:
@@ -120,7 +121,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -128,15 +129,18 @@ jobs:
         with:
           base: origin/main
           head: HEAD
+          version: 1.1.0
 ```
 
-Pin to a specific release (for example `kearns2000/BlastGuard@v1.0.0`) if you prefer reproducible runs over automatic minor updates.
+Checkout must use `fetch-depth: 0` so `origin/main` exists for comparison. Pin both the action tag and the `version` input when you need the action and NuGet tool to stay in lockstep.
+
+Pin to a specific release (for example `kearns2000/BlastGuard@v1.1.0`) if you prefer reproducible runs over automatic minor updates.
 
 #### Inputs
 
 | Input | Description | Default |
 | --- | --- | --- |
-| `base` | Base git ref to compare against. | `origin/main` |
+| `base` | Base git ref to compare against. Requires `fetch-depth: 0` on checkout. | `origin/main` |
 | `head` | Head git ref to analyse. | `HEAD` |
 | `repo` | Path to the git repository. | `.` |
 | `format` | Output format: `text`, `json`, `markdown`, or `github`. | `github` |
@@ -144,7 +148,7 @@ Pin to a specific release (for example `kearns2000/BlastGuard@v1.0.0`) if you pr
 | `config` | Optional path to a `blastguard.json` configuration file. | `''` |
 | `fail-threshold` | Fail the step when the score meets or exceeds this value. Leave empty to never fail. | `''` |
 | `include-suggestions` | Include suggested review focus in the output. | `true` |
-| `version` | BlastGuard tool version to install. Defaults to the latest release. | `''` |
+| `version` | BlastGuard NuGet tool version. Pin alongside the action tag for reproducible runs. | `''` (latest) |
 | `dotnet-version` | .NET SDK version to install. | `10.0.x` |
 | `job-summary` | Append the report to the GitHub Actions job summary. | `true` |
 
@@ -170,23 +174,25 @@ jobs:
           fetch-depth: 0
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
       - name: Install BlastGuard
-        run: dotnet tool install --global BlastGuard
+        run: |
+          dotnet tool install --global BlastGuard || dotnet tool update --global BlastGuard
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
 
       - name: Run BlastGuard
         run: blastguard analyse --base origin/main --head HEAD --format github --output blastguard-report.md
 
       - name: Add report to job summary
+        if: always()
         run: cat blastguard-report.md >> $GITHUB_STEP_SUMMARY
 ```
-
 ## Configuration
 
-BlastGuard reads `blastguard.json` from the repository root by default. You can also pass `--config <path>`.
+BlastGuard reads `blastguard.json` from the repository root by default. Relative `--config` paths are resolved against `--repo`, not the current working directory.
 
 See `blastguard.sample.json` for a useful starting point.
 
@@ -292,7 +298,7 @@ dotnet pack
 Run locally without installing the tool:
 
 ```bash
-dotnet run --project src/BlastGuard.Cli -- analyse --base main --head HEAD
+dotnet run --project src/BlastGuard.Cli -- analyse --base origin/main --head HEAD
 ```
 
 ## Licence
