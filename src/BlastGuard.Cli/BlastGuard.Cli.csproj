@@ -10,7 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>blastguard</ToolCommandName>
     <PackageId>BlastGuard</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>BlastGuard</Authors>
     <Title>BlastGuard - Pull Request Blast Radius Scorer</Title>
     <Description>A .NET global tool that scores pull request blast radius and review risk. Analyses git diffs for API contracts, EF Core migrations, production configuration, security-sensitive code, and missing tests. Run locally or in GitHub Actions CI.</Description>

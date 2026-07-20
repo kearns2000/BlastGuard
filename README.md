@@ -129,12 +129,12 @@ jobs:
         with:
           base: origin/main
           head: HEAD
-          version: 1.1.0
+          version: 1.1.1
 ```
 
 Checkout must use `fetch-depth: 0` so `origin/main` exists for comparison. Pin both the action tag and the `version` input when you need the action and NuGet tool to stay in lockstep.
 
-Pin to a specific release (for example `kearns2000/BlastGuard@v1.1.0`) if you prefer reproducible runs over automatic minor updates.
+Pin to a specific release (for example `kearns2000/BlastGuard@v1.1.1`) if you prefer reproducible runs over automatic minor updates.
 
 #### Inputs
 
