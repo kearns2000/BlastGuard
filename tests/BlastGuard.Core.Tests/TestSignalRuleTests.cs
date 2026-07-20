@@ -19,7 +19,7 @@ public class TestSignalRuleTests
         var report = TestFixtures.Score(
             TestFixtures.File("src/Features/Payments/PaymentService.cs"));
 
-        Assert.Contains(report.Findings, f => f.Points == 10 && f.Title.Contains("No matching test"));
+        Assert.Contains(report.Findings, f => f.Points == 10 && f.Title.Contains("No test files"));
     }
 
     [Fact]

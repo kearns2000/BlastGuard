@@ -24,6 +24,14 @@ public static class RuleHelpers
     public static bool PathContainsAny(string path, params string[] segments) =>
         segments.Any(segment => path.Contains(segment, StringComparison.OrdinalIgnoreCase));
 
+    public static bool PathContainsSegment(string path, string segment)
+    {
+        var normalised = PathMatcher.NormalisePath(path);
+        return normalised
+            .Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Any(part => part.Equals(segment, StringComparison.OrdinalIgnoreCase));
+    }
+
     public static bool PatchContainsAny(string? patch, params string[] indicators) =>
         patch is not null && indicators.Any(indicator =>
             patch.Contains(indicator, StringComparison.Ordinal));
@@ -56,7 +64,6 @@ public static class RuleHelpers
     {
         var normalised = PathMatcher.NormalisePath(path);
         return normalised.Contains(".Tests", StringComparison.OrdinalIgnoreCase)
-            || normalised.Contains(".Test", StringComparison.OrdinalIgnoreCase)
             || normalised.Contains("/Tests/", StringComparison.OrdinalIgnoreCase)
             || normalised.Contains("/Test/", StringComparison.OrdinalIgnoreCase)
             || normalised.EndsWith("Tests.cs", StringComparison.OrdinalIgnoreCase)

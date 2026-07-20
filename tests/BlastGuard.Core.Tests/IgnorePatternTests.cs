@@ -19,6 +19,6 @@ public class IgnorePatternTests
         var report = Scoring.BlastGuardScorer.CreateDefault().Score(changeSet, configuration);
 
         Assert.DoesNotContain(report.Findings, f => f.Message.Contains("3000 lines"));
-        Assert.Contains(report.Findings, f => f.Title.Contains("No matching test"));
+        Assert.Contains(report.Findings, f => f.Title.Contains("No test files"));
     }
 }

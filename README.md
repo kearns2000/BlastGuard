@@ -86,14 +86,14 @@ Main risk signals:
 - EF Core migration changed
 - Production appsettings changed
 - Authentication code touched
-- No matching test changes found
+- No test files changed
 
 Suggested review focus:
 - Check whether API consumers, message consumers, or generated clients are affected.
 - Confirm the migration is backwards compatible.
 - Confirm the new configuration exists in every required environment.
 - Review authentication, authorisation, claims, and permission behaviour carefully.
-- Add or update tests around the changed contract.
+- Add or update tests around the highest-risk changed areas.
 ```
 
 ## GitHub Actions usage
@@ -188,7 +188,10 @@ jobs:
 
       - name: Add report to job summary
         if: always()
-        run: cat blastguard-report.md >> $GITHUB_STEP_SUMMARY
+        run: |
+          if [ -f blastguard-report.md ]; then
+            cat blastguard-report.md >> "$GITHUB_STEP_SUMMARY"
+          fi
 ```
 ## Configuration
 

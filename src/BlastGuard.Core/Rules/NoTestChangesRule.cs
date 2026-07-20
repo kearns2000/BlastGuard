@@ -33,7 +33,7 @@ public sealed class NoTestChangesRule : IBlastGuardRule
       yield return new RiskFinding(
           RiskCategory.Tests,
           Id,
-          "No matching test changes found",
+          "No test files changed",
           "Production code changed but no test files were updated.",
           10);
     }

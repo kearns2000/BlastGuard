@@ -36,4 +36,26 @@ public class PublicContractRuleTests
             f.Category == Scoring.RiskCategory.PublicContract
             && f.Points == 20);
     }
+
+    [Fact]
+    public void DoesNotFlagContractorPathAsPublicContract()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("src/Billing/ContractorManagementService.cs"));
+
+        Assert.DoesNotContain(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.PublicContract
+            && f.Title.Contains("Public contract file"));
+    }
+
+    [Fact]
+    public void DoesNotFlagRequestPipelinePathAsPublicContract()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("src/Infrastructure/RequestPipelineMiddleware.cs"));
+
+        Assert.DoesNotContain(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.PublicContract
+            && f.Title.Contains("Public contract file"));
+    }
 }

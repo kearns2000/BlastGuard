@@ -81,11 +81,20 @@ developer-tools
 2. Commit, push to `main`
 3. Tag and push: `git tag v1.1.1 && git push origin v1.1.1`
 
-Each tag triggers build then test then pack then trusted publish.
+Each semver tag triggers build, test, pack, and trusted publish. Floating major tags such as `v1` are for the GitHub Action only and do not publish to NuGet.
+
+4. Move the floating Action tag so Marketplace `@v1` picks up the new action:
+
+```bash
+git tag -f v1
+git push --force origin v1
+```
+
+Do this after each release if you want `@v1` consumers to receive the latest action metadata without changing their workflow pin.
 
 ## Notes
 
-- Tags must match `v*` (e.g. `v1.0.0`, `v1.2.3`)
+- NuGet publish tags must be semver (`v1.0.0`, `v1.2.3`). Tags like `v1` alone do not publish to NuGet.
 - NuGet does not allow republishing the same version, so bump the version for every release
 - The temporary API key from `NuGet/login@v1` expires in about an hour; push immediately after login
 - Do **not** store a `NUGET_API_KEY` secret, as trusted publishing replaces it

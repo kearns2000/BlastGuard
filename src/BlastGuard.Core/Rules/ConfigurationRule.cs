@@ -39,7 +39,8 @@ public sealed class ConfigurationRule : IBlastGuardRule
               && fileName.EndsWith(".json", StringComparison.OrdinalIgnoreCase)))
       {
         var isProduction = fileName.Contains("Production", StringComparison.OrdinalIgnoreCase)
-            || fileName.Contains("Prod", StringComparison.OrdinalIgnoreCase);
+            || fileName.Equals("appsettings.Prod.json", StringComparison.OrdinalIgnoreCase)
+            || fileName.Contains(".Prod.", StringComparison.OrdinalIgnoreCase);
 
         yield return new RiskFinding(
             RiskCategory.Configuration,

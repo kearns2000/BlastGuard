@@ -61,7 +61,7 @@ public sealed class PublicContractRule : IBlastGuardRule
         continue;
       }
 
-      if (RuleHelpers.PathContainsAny(path, ContractPathSegments))
+      if (MatchesContractPath(path))
       {
         yield return new RiskFinding(
             RiskCategory.PublicContract,
@@ -83,5 +83,25 @@ public sealed class PublicContractRule : IBlastGuardRule
             file.Path);
       }
     }
+  }
+
+  internal static bool MatchesContractPath(string path)
+  {
+    var normalised = PathMatcher.NormalisePath(path);
+    var fileName = Path.GetFileNameWithoutExtension(normalised);
+
+    foreach (var segment in ContractPathSegments)
+    {
+      if (RuleHelpers.PathContainsSegment(normalised, segment))
+      {
+        return true;
+      }
+    }
+
+    return fileName.EndsWith("Request", StringComparison.OrdinalIgnoreCase)
+        || fileName.EndsWith("Response", StringComparison.OrdinalIgnoreCase)
+        || fileName.EndsWith("Dto", StringComparison.OrdinalIgnoreCase)
+        || fileName.EndsWith("Contract", StringComparison.OrdinalIgnoreCase)
+        || fileName.EndsWith("Controller", StringComparison.OrdinalIgnoreCase);
   }
 }

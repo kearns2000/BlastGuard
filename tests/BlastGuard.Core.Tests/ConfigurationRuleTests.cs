@@ -53,6 +53,19 @@ public class ConfigurationRuleTests
     }
 
     [Fact]
+    public void DoesNotTreatProductAppsettingsAsProduction()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File("src/Api/appsettings.ProductCatalog.json"));
+
+        Assert.Contains(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.Configuration
+            && f.Title.Contains("Appsettings")
+            && !f.Title.Contains("Production"));
+        Assert.DoesNotContain(report.Findings, f => f.Title.Contains("Production appsettings"));
+    }
+
+    [Fact]
     public void DetectsOptionsClassByFileNameSuffix()
     {
         var report = TestFixtures.Score(

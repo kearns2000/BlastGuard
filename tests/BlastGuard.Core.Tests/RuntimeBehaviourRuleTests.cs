@@ -45,4 +45,17 @@ public class RuntimeBehaviourRuleTests
             f.Category == Scoring.RiskCategory.RuntimeBehaviour
             && f.Title.Contains("Queue"));
     }
+
+    [Fact]
+    public void DoesNotFlagCancellationTokenParameterOnly()
+    {
+        var report = TestFixtures.Score(
+            TestFixtures.File(
+                "src/Api/OrdersController.cs",
+                patch: "public async Task<IActionResult> Get(CancellationToken cancellationToken) { }"));
+
+        Assert.DoesNotContain(report.Findings, f =>
+            f.Category == Scoring.RiskCategory.RuntimeBehaviour
+            && f.Title.Contains("CancellationToken"));
+    }
 }

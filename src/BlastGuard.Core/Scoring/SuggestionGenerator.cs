@@ -58,7 +58,7 @@ internal static class SuggestionGenerator
 
         if (findings.Any(f => f.RuleId == "no-test-changes"))
         {
-            const string testSuggestion = "Add or update tests around the changed contract.";
+            const string testSuggestion = "Add or update tests around the highest-risk changed areas.";
             if (!suggestions.Contains(testSuggestion))
             {
                 suggestions.Add(testSuggestion);

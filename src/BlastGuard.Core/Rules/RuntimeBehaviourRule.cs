@@ -18,8 +18,6 @@ public sealed class RuntimeBehaviourRule : IBlastGuardRule
           "Caching changed", "Caching changed in: {0}.", 10),
       (["Task.Run", "Parallel.ForEach", "SemaphoreSlim", "lock (", "Monitor.Enter"],
           "Concurrency-sensitive code changed", "Concurrency-sensitive code changed in: {0}.", 15),
-      (["CancellationToken"],
-          "CancellationToken handling changed", "CancellationToken handling changed in: {0}.", 10),
       (["HttpClient", "AddHttpClient"],
           "HttpClient configuration changed", "HttpClient configuration changed in: {0}.", 10)
   ];
